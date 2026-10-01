@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app.tools import knowledge_search, run_tool, tool_declaration  # noqa: E402
+from app.tools import build_tool, knowledge_search  # noqa: E402
 
 
 def test_search_finds_relevant_chunk():
@@ -23,9 +23,11 @@ def test_unregistered_file_rejected():
         assert r["found"] is False and "error" in r
 
 
-def test_schema_enum_matches_registry():
-    assert "courses.txt" in tool_declaration()["parameters_json_schema"]["properties"]["file_name"]["enum"]
+def test_tool_schema_enum_matches_registry():
+    schema = build_tool().get_input_schema().model_json_schema()
+    assert "courses.txt" in schema["properties"]["file_name"]["enum"]
 
 
-def test_run_tool_returns_json():
-    assert json.loads(run_tool("knowledge_search", {"file_name": "courses.txt", "query": "branches"}))["found"]
+def test_tool_invoke_returns_json():
+    out = build_tool().invoke({"file_name": "courses.txt", "query": "branches"})
+    assert json.loads(out)["found"]

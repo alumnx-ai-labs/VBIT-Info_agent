@@ -1,6 +1,6 @@
 # VBIT agent
 
-Chat assistant for VBIT college. Python/FastAPI backend, React (Vite) frontend, no database: all knowledge lives in `data/*.txt` and is described by `knowledge.yaml`.
+Chat assistant for VBIT college. Python/FastAPI backend (LangChain agent with Gemini), React (Vite) frontend, no database: all knowledge lives in `data/*.txt` and is described by `knowledge.yaml`.
 
 > The files in `data/` contain **sample content**. Replace them with verified VBIT information before real use.
 

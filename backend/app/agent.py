@@ -1,12 +1,14 @@
-"""Tool-using agent loop (Gemini): question -> pick file(s) from knowledge.yaml -> search -> answer."""
+"""LangChain agent: question -> pick file(s) from knowledge.yaml -> knowledge_search -> answer."""
 import json
 
-from google import genai
-from google.genai import types
+from langchain.agents import create_agent
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langgraph.errors import GraphRecursionError
 
 from . import config
 from .knowledge import catalog_text
-from .tools import run_tool, tool_declaration
+from .tools import build_tool
 
 SYSTEM_PROMPT = """You are {name}, the information assistant for VBIT college.
 
@@ -34,41 +36,48 @@ For greetings or questions about what you can do, reply briefly without searchin
 Be concise and friendly. Use British English."""
 
 
+def _build_agent():
+    # Rebuilt per request so changes to knowledge.yaml apply without a restart.
+    model = ChatGoogleGenerativeAI(
+        model=config.MODEL, google_api_key=config.GEMINI_API_KEY, max_output_tokens=1500
+    )
+    return create_agent(
+        model,
+        tools=[build_tool()],
+        system_prompt=SYSTEM_PROMPT.format(name=config.AGENT_NAME, catalog=catalog_text()),
+    )
+
+
+def _sources(messages) -> list[str]:
+    """Files whose knowledge_search call returned hits, in call order."""
+    found: list[str] = []
+    for m in messages:
+        if isinstance(m, ToolMessage):
+            try:
+                data = json.loads(m.text)
+            except (json.JSONDecodeError, TypeError):
+                continue
+            if data.get("found") and data["file"] not in found:
+                found.append(data["file"])
+    return found
+
+
 def run_agent(history: list[dict]) -> dict:
     """history: [{'role': 'user'|'assistant', 'content': str}, ...] ending with a user turn.
     Returns {'answer': str, 'sources': [names of files that produced hits]}."""
-    contents = [
-        types.Content(
-            role="model" if m["role"] == "assistant" else "user",
-            parts=[types.Part.from_text(text=m["content"])],
-        )
+    messages = [
+        (HumanMessage if m["role"] == "user" else AIMessage)(content=m["content"])
         for m in history[-config.MAX_HISTORY_MESSAGES:]
     ]
-    cfg = types.GenerateContentConfig(
-        system_instruction=SYSTEM_PROMPT.format(name=config.AGENT_NAME, catalog=catalog_text()),
-        tools=[types.Tool(function_declarations=[types.FunctionDeclaration(**tool_declaration())])],
-        automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True),
-        max_output_tokens=1500,
-    )
-    client = genai.Client(api_key=config.GEMINI_API_KEY)
-    sources: list[str] = []
-
-    for _ in range(config.MAX_TOOL_ROUNDS):
-        resp = client.models.generate_content(model=config.MODEL, contents=contents, config=cfg)
-        calls = resp.function_calls or []
-        if not calls:
-            return {"answer": (resp.text or "").strip(), "sources": sources}
-
-        contents.append(resp.candidates[0].content)
-        parts = []
-        for call in calls:
-            output = json.loads(run_tool(call.name, dict(call.args or {})))
-            if output.get("found") and output["file"] not in sources:
-                sources.append(output["file"])
-            parts.append(types.Part.from_function_response(name=call.name, response=output))
-        contents.append(types.Content(role="user", parts=parts))
-
-    return {
-        "answer": "Sorry, I could not complete the search. Please try rephrasing your question.",
-        "sources": sources,
-    }
+    try:
+        result = _build_agent().invoke(
+            {"messages": messages}, {"recursion_limit": 2 * config.MAX_TOOL_ROUNDS + 1}
+        )
+    except GraphRecursionError:
+        return {
+            "answer": "Sorry, I could not complete the search. Please try rephrasing your question.",
+            "sources": [],
+        }
+    out = result["messages"]
+    answer = next((m.text for m in reversed(out) if isinstance(m, AIMessage) and m.text), "").strip()
+    return {"answer": answer, "sources": _sources(out[len(messages):])}

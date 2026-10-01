@@ -1,30 +1,11 @@
-"""The agent's single tool: knowledge_search(file_name, query)."""
+"""The agent's single tool: knowledge_search(file_name, query), exposed as a LangChain tool."""
 import json
+from typing import Literal
+
+from langchain_core.tools import StructuredTool
+from pydantic import BaseModel, Field, create_model
 
 from .knowledge import KnowledgeError, registered_files, search_file
-
-
-def tool_declaration() -> dict:
-    """Built from knowledge.yaml so the allowed files always match the registry."""
-    return {
-        "name": "knowledge_search",
-        "description": (
-            "Search one VBIT knowledge file for information relevant to a query. "
-            "Call once per file; call several times for questions spanning several files."
-        ),
-        "parameters_json_schema": {
-            "type": "object",
-            "properties": {
-                "file_name": {
-                    "type": "string",
-                    "enum": list(registered_files()),
-                    "description": "Registered knowledge file to search.",
-                },
-                "query": {"type": "string", "description": "Keywords or question to look for in that file."},
-            },
-            "required": ["file_name", "query"],
-        },
-    }
 
 
 def knowledge_search(file_name: str, query: str) -> dict:
@@ -34,7 +15,23 @@ def knowledge_search(file_name: str, query: str) -> dict:
         return {"file": file_name, "found": False, "error": str(e)}
 
 
-def run_tool(name: str, args: dict) -> str:
-    if name != "knowledge_search":
-        return json.dumps({"error": f"Unknown tool '{name}'"})
-    return json.dumps(knowledge_search(args.get("file_name", ""), args.get("query", "")))
+def _args_schema() -> type[BaseModel]:
+    """Built from knowledge.yaml so the allowed file names always match the registry."""
+    files = tuple(registered_files())
+    return create_model(
+        "KnowledgeSearchInput",
+        file_name=(Literal[files], Field(description="Registered knowledge file to search.")),
+        query=(str, Field(description="Keywords or question to look for in that file.")),
+    )
+
+
+def build_tool() -> StructuredTool:
+    return StructuredTool.from_function(
+        func=lambda file_name, query: json.dumps(knowledge_search(file_name, query)),
+        name="knowledge_search",
+        description=(
+            "Search one VBIT knowledge file for information relevant to a query. "
+            "Call once per file; call several times for questions spanning several files."
+        ),
+        args_schema=_args_schema(),
+    )

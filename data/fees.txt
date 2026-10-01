@@ -1,0 +1,19 @@
+NOTE: SAMPLE CONTENT for demonstration. Replace with verified VBIT information before real use.
+
+# Tuition fees (B.Tech, per year)
+- CSE: INR 1,10,000 per year
+- CSE (Artificial Intelligence and Machine Learning): INR 1,10,000 per year
+- ECE: INR 95,000 per year
+- EEE: INR 90,000 per year
+
+# Other fees
+- Admission and registration fee: INR 5,000 (one time)
+- Examination fee: INR 3,000 per semester
+- Caution deposit: INR 5,000 (refundable)
+
+# Hostel and transport fees
+- Hostel: INR 70,000 per year including food
+- Bus transport: INR 25,000 per year, depending on route
+
+# Payment
+Fees are paid in two instalments per academic year at the accounts office or online.

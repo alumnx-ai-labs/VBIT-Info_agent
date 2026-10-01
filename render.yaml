@@ -1,0 +1,11 @@
+# Render Blueprint: backend only (Docker). Frontend is deployed separately on Vercel.
+services:
+  - type: web
+    name: vbit-agent-api
+    runtime: docker
+    healthCheckPath: /api/health
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false          # set in the Render dashboard
+      - key: CORS_ORIGINS
+        sync: false          # your Vercel URL, e.g. https://vbit-agent.vercel.app

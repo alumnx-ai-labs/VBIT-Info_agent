@@ -1,0 +1,26 @@
+# Registry of the knowledge base. The agent reads this file to decide which
+# file to search. To add knowledge: drop a .txt file into data/ and register it here.
+knowledge:
+  admissions:
+    file: admissions.txt
+    description: Admission process, eligibility and required documents
+
+  courses:
+    file: courses.txt
+    description: Courses and branches offered by VBIT, intake and curriculum
+
+  fees:
+    file: fees.txt
+    description: Tuition and other fees
+
+  placements:
+    file: placements.txt
+    description: Placement information and recruiters
+
+  facilities:
+    file: facilities.txt
+    description: Campus facilities such as library, hostel, transport, labs and sports
+
+  contact:
+    file: contact.txt
+    description: College address, phone, email and office timings

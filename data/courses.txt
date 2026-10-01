@@ -1,0 +1,17 @@
+NOTE: SAMPLE CONTENT for demonstration. Replace with verified VBIT information before real use.
+
+# Undergraduate programmes (B.Tech)
+VBIT offers four-year B.Tech programmes in the following branches:
+- Computer Science and Engineering (CSE)
+- Computer Science and Engineering (Artificial Intelligence and Machine Learning)
+- Electronics and Communication Engineering (ECE)
+- Electrical and Electronics Engineering (EEE)
+
+# Intake
+Sample intake per branch: CSE 180 seats, CSE (AI and ML) 60 seats, ECE 120 seats, EEE 60 seats.
+
+# Curriculum
+Each B.Tech programme has eight semesters covering core subjects, electives, laboratories, a mini project and a final-year major project.
+
+# Postgraduate programmes
+M.Tech and MBA programmes are listed as sample entries only: M.Tech (CSE) and MBA.

@@ -1,0 +1,16 @@
+NOTE: SAMPLE CONTENT for demonstration. Replace with verified VBIT information before real use.
+
+# Library
+Central library with textbooks, reference books, journals and a digital library section.
+
+# Hostel
+Separate hostels for boys and girls with mess facilities.
+
+# Transport
+College buses run on multiple routes across the city.
+
+# Laboratories
+Departmental laboratories for computing, electronics and electrical engineering, plus a central computer centre with internet access.
+
+# Sports
+Playground for cricket and volleyball, and an indoor games room.

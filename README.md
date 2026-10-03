@@ -67,13 +67,13 @@ The repo ships a read-only security/code-quality subagent at [`.agents/agents/co
 
 1. Clone the repo and run the app locally (see [Run locally](#run-locally)): backend on http://localhost:8000, frontend on http://localhost:5173.
 2. Open the repo folder (the one containing `.agents/`) in Google Antigravity.
-3. Confirm it is discovered: type `/agents` in the prompt and press Enter. `code-auditor` should be listed.
+3. Select a Gemini model in the chat (e.g. Gemini 3.6 Flash) and start a new conversation. (`/agents` may not exist in every Antigravity version.)
 4. In the chat, ask the main agent to delegate, e.g.:
-   > Use the code-auditor subagent to review this repo for security issues.
+   > Use the code-auditor subagent to do a code-quality and best-practices review of this repo, including how API keys and file paths are handled.
 
    Or narrow it: *"Use the code-auditor subagent to check `backend/app/tools.py` for path traversal and prompt injection."*
 5. The main agent calls it through its `invoke_subagent` tool, guided by the subagent's `description`.
-6. Monitor the run: type `/agents`, press Enter, and select the run to see its reasoning log and tool calls.
+6. Watch the chat for the `invoke_subagent` call and the separate `code-auditor` run. If your version has `/agents`, you can open the run there to see its reasoning log and tool calls.
 7. Read the report (Critical / Warning / Suggestion, with file and line). The subagent is read-only; apply fixes yourself or ask the main agent to.
 
 To customise it, edit the frontmatter (`tools`, `model`, `commandExecutionPolicy`) or the system prompt in `code-auditor.md`; Antigravity picks up changes on save. To make it available in all projects, copy it to `~/.gemini/config/agents/`.

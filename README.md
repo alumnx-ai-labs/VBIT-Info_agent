@@ -1,6 +1,6 @@
 # VBIT agent
 
-Chat assistant for VBIT college. Python/FastAPI backend, React (Vite) frontend, no database: all knowledge lives in `data/*.txt` and is described by `knowledge.yaml`.
+Chat assistant for VBIT college. Python/FastAPI backend (LangChain + Gemini + Tavily + LangSmith), React (Vite) frontend, no database: all knowledge lives in `data/*.txt` and is described by `knowledge.yaml`.
 
 > The files in `data/` contain **sample content**. Replace them with verified VBIT information before real use.
 
@@ -13,7 +13,9 @@ Question -> model reads the catalogue built from knowledge.yaml -> knowledge_sea
 
 - File selection is done by the model from the descriptions in `knowledge.yaml`; there is no hard-coded routing.
 - `knowledge_search` only accepts files registered in `knowledge.yaml` (the tool schema enum is generated from it, and the server re-checks and blocks path traversal).
-- If nothing relevant is found, the agent says the information is not in the knowledge base.
+- If the local knowledge base cannot answer a VBIT question, the agent falls back to **Tavily** web search and clearly labels web sources.
+- **Resume matching**: paste a resume in the chat and the `match_jobs` tool scores it against the sample listings in `data/jobs.md` (keyword/skill overlap, a screening aid only).
+- **LangSmith**: set `LANGSMITH_API_KEY` (and optionally `LANGSMITH_PROJECT`) to trace every agent run.
 
 ## Add knowledge
 
@@ -23,7 +25,7 @@ Question -> model reads the catalogue built from knowledge.yaml -> knowledge_sea
 ## Run locally
 
 ```bash
-cp .env.example .env            # set GEMINI_API_KEY
+cp .env.example .env            # set GEMINI_API_KEY, TAVILY_API_KEY, LANGSMITH_API_KEY
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r backend/requirements.txt
 uvicorn backend.app.main:app --reload --port 8000   # from repo root
@@ -49,7 +51,7 @@ Single-service mode: `cd frontend && npm run build`, then open http://localhost:
 
 Render's free tier sleeps when idle, so the first request after a pause can take about 30-60 seconds.
 
-Optional env vars: `VBIT_MODEL`, `CORS_ORIGINS`, `CORS_ORIGIN_REGEX`.
+Also set `TAVILY_API_KEY` and `LANGSMITH_API_KEY` on Render. Optional env vars: `VBIT_MODEL`, `LANGSMITH_PROJECT`, `CORS_ORIGINS`, `CORS_ORIGIN_REGEX`.
 
 ## Tests
 

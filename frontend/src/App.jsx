@@ -89,8 +89,11 @@ export default function App() {
     setLoadingId(id);
     try {
       // The welcome message is UI only; the API history must start with a user turn.
-      const { answer, sources } = await sendChat(next.slice(1));
-      update(id, (c) => ({ ...c, messages: [...next, { role: "assistant", content: answer, sources }] }));
+      const { answer, sources, web_sources } = await sendChat(next.slice(1));
+      update(id, (c) => ({
+        ...c,
+        messages: [...next, { role: "assistant", content: answer, sources, webSources: web_sources }],
+      }));
     } catch (err) {
       update(id, (c) => ({ ...c, messages: [...next, { role: "assistant", content: err.message, error: true }] }));
     } finally {
@@ -154,6 +157,14 @@ export default function App() {
                       <span>Sources</span>
                       {m.sources.map((s) => (
                         <span key={s} className="chip">{s}</span>
+                      ))}
+                    </div>
+                  )}
+                  {m.webSources?.length > 0 && (
+                    <div className="sources">
+                      <span>Web</span>
+                      {m.webSources.map((w) => (
+                        <a key={w.url} className="chip" href={w.url} target="_blank" rel="noreferrer">{w.title}</a>
                       ))}
                     </div>
                   )}

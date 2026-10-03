@@ -10,10 +10,20 @@ load_dotenv(ROOT_DIR / ".env")
 
 DATA_DIR = ROOT_DIR / "data"
 KNOWLEDGE_YAML = ROOT_DIR / "knowledge.yaml"
+JOBS_FILE = DATA_DIR / "jobs.md"
 FRONTEND_DIST = ROOT_DIR / "frontend" / "dist"
 
 AGENT_NAME = "VBIT agent"
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
+LANGSMITH_API_KEY = os.getenv("LANGSMITH_API_KEY")
+LANGSMITH_PROJECT = os.getenv("LANGSMITH_PROJECT", "VBIT-Agent")
+
+# LangChain reads these from the environment; enable tracing only when a key is present.
+if LANGSMITH_API_KEY:
+    os.environ["LANGSMITH_TRACING"] = "true"
+    os.environ["LANGSMITH_API_KEY"] = LANGSMITH_API_KEY
+    os.environ["LANGSMITH_PROJECT"] = LANGSMITH_PROJECT
 MODEL = os.getenv("VBIT_MODEL", "gemini-2.5-flash")
 MAX_TOOL_ROUNDS = 6
 MAX_HISTORY_MESSAGES = 20

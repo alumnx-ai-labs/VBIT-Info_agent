@@ -1,5 +1,10 @@
 fastapi>=0.115
 uvicorn[standard]>=0.30
+langchain>=1.0
+langchain-google-genai>=3.0
+langgraph>=1.0
+tavily-python>=0.5
+langsmith>=0.3
 google-genai>=1.0
 pyyaml>=6.0
 python-dotenv>=1.0

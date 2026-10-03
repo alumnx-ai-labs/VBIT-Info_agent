@@ -51,6 +51,8 @@ def chat(req: ChatRequest):
         if e.code in (400, 401, 403):
             raise HTTPException(status_code=500, detail="GEMINI_API_KEY is invalid or not permitted.")
         raise HTTPException(status_code=502, detail=f"Model service error ({e.code}). Please retry.")
+    except Exception:
+        raise HTTPException(status_code=502, detail="Model service error. Please retry.")
 
 
 # Serve the built frontend (single-service deployment). Absent in dev: use Vite.

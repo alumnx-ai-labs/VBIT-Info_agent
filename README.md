@@ -77,3 +77,7 @@ The repo ships a read-only security/code-quality subagent at [`.agents/agents/co
 7. Read the report (Critical / Warning / Suggestion, with file and line). The subagent is read-only; apply fixes yourself or ask the main agent to.
 
 To customise it, edit the frontmatter (`tools`, `model`, `commandExecutionPolicy`) or the system prompt in `code-auditor.md`; Antigravity picks up changes on save. To make it available in all projects, copy it to `~/.gemini/config/agents/`.
+
+### Claude Code version
+
+The same subagent exists at [`.claude/agents/code-auditor.md`](.claude/agents/code-auditor.md) for Claude Code (the project-level folder Claude Code reads). After running the app locally, open the repo in Claude Code and ask: *"Use the code-auditor subagent to review this repo."* It runs read-only and reports Critical / Warning / Suggestion findings.

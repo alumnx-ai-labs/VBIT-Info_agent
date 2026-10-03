@@ -58,3 +58,22 @@ Also set `TAVILY_API_KEY` and `LANGSMITH_API_KEY` on Render. Optional env vars: 
 ```bash
 pytest backend
 ```
+
+## Code-auditor subagent (Google Antigravity)
+
+The repo ships a read-only security/code-quality subagent at [`.agents/agents/code-auditor.md`](.agents/agents/code-auditor.md) (Markdown with YAML frontmatter). It is project-level, so Antigravity discovers it automatically when you open this repo.
+
+### Trigger it on your local copy
+
+1. Clone the repo and run the app locally (see [Run locally](#run-locally)): backend on http://localhost:8000, frontend on http://localhost:5173.
+2. Open the repo folder (the one containing `.agents/`) in Google Antigravity.
+3. Confirm it is discovered: type `/agents` in the prompt and press Enter. `code-auditor` should be listed.
+4. In the chat, ask the main agent to delegate, e.g.:
+   > Use the code-auditor subagent to review this repo for security issues.
+
+   Or narrow it: *"Use the code-auditor subagent to check `backend/app/tools.py` for path traversal and prompt injection."*
+5. The main agent calls it through its `invoke_subagent` tool, guided by the subagent's `description`.
+6. Monitor the run: type `/agents`, press Enter, and select the run to see its reasoning log and tool calls.
+7. Read the report (Critical / Warning / Suggestion, with file and line). The subagent is read-only; apply fixes yourself or ask the main agent to.
+
+To customise it, edit the frontmatter (`tools`, `model`, `commandExecutionPolicy`) or the system prompt in `code-auditor.md`; Antigravity picks up changes on save. To make it available in all projects, copy it to `~/.gemini/config/agents/`.
